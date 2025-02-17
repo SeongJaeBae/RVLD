@@ -1,0 +1,5 @@
+*.Identifier
+*.pyc
+OpenLane-V/
+VIL-100/
+pretrained/

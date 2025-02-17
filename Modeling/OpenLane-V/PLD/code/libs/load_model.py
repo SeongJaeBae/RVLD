@@ -69,18 +69,21 @@ def load_model_for_train(cfg, dict_DB):
     return dict_DB
 
 def load_pretrained_model_s(cfg):
-    checkpoint = torch.load(f'{cfg.dir["pretrained_weight1"]}/checkpoint_max_seg_fscore_{cfg.dataset_name}')
     if cfg.run_mode == 'test_paper':
         checkpoint = torch.load(f'{cfg.dir["weight_paper"]}/checkpoint_max_seg_fscore_openlane-v_ILD_seg')
+    else:
+        checkpoint = torch.load(f'{cfg.dir["pretrained_weight1"]}/checkpoint_max_seg_fscore_{cfg.dataset_name}')
+
     model = Model_S(cfg=cfg)
     model.load_state_dict(checkpoint['model'], strict=False)
     model.cuda()
     return model
 
 def load_pretrained_model_c(cfg):
-    checkpoint = torch.load(f'{cfg.dir["pretrained_weight2"]}/checkpoint_max_F1_{cfg.dataset_name}')
     if cfg.run_mode == 'test_paper':
         checkpoint = torch.load(f'{cfg.dir["weight_paper"]}/checkpoint_max_F1_openlane-v_ILD_coeff')
+    else:
+        checkpoint = torch.load(f'{cfg.dir["pretrained_weight2"]}/checkpoint_max_F1_{cfg.dataset_name}')
     model = Model_C(cfg=cfg)
     model.load_state_dict(checkpoint['model'], strict=False)
     model.cuda()
