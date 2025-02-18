@@ -30,6 +30,8 @@ def main():
     os.environ["CUDA_VISIBLE_DEVICES"] = cfg.gpu_id
     torch.backends.cudnn.deterministic = True
 
+    for key, value in vars(cfg).items():
+        print(f"{key}: {value}")
     # prepare
     dict_DB = dict()
     dict_DB = prepare_visualization(cfg, dict_DB)

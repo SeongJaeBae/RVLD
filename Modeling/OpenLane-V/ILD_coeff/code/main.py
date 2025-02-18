@@ -27,6 +27,8 @@ def main():
     cfg = Config()
     cfg = parse_args(cfg)
 
+    for key, value in vars(cfg).items():
+        print(f"{key}: {value}")
     os.environ["CUDA_VISIBLE_DEVICES"] = cfg.gpu_id
     torch.backends.cudnn.deterministic = True
 

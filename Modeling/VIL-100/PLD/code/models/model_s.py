@@ -113,6 +113,7 @@ class Model(nn.Module):
         x4 = torch.nn.functional.interpolate(x4, scale_factor=2, mode='bilinear')
         self.img_feat = self.feat_refine(x4)
 
+    #probmap!!!!
     def forward_for_classification(self):
         out = self.classifier(self.img_feat)
         self.prob_map = F.softmax(out, dim=1)

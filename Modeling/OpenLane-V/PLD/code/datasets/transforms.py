@@ -64,13 +64,14 @@ class Transforms(object):
         anno_new = self.linestrings_to_lanes(line_strings)
         return img_new, anno_new
 
-    def process_for_test(self, img_org, anno):
+    def process_for_test(self, img_org, ):
         img_org = np.uint8(img_org)
-        line_strings_org = self.lane_to_linestrings(anno)
-        line_strings_org = LineStringsOnImage(line_strings_org, shape=img_org.shape)
-        img_new, line_strings = self.transform_for_test(image=img_org, line_strings=line_strings_org)
-        anno_new = self.linestrings_to_lanes(line_strings)
-        return img_new, anno_new
+        # line_strings_org = self.lane_to_linestrings(anno)
+        # line_strings_org = LineStringsOnImage(line_strings_org, shape=img_org.shape)
+        # img_new, line_strings = self.transform_for_test(image=img_org, line_strings=line_strings_org)
+        img_new = self.transform_for_test(image=img_org)
+        # anno_new = self.linestrings_to_lanes(line_strings)
+        return img_new
 
     def check_one_to_one_mapping(self, data):
         dy = (data[:, 1][1:] - data[:, 1][:-1])

@@ -37,6 +37,7 @@ class Test_Process(object):
             model_c.eval()
             model.eval()
 
+            #여기에서 preprocessing 없으면 터짐 -> dataset_openlane 에서 수정해서 label 데이터 안 불러오게 수정
             for i, batch in enumerate(self.testloader):  # load batch data
                 batch = self.batch_to_cuda(batch)
 
@@ -74,13 +75,14 @@ class Test_Process(object):
                     out.update(self.post_process.lane_mask_generation(out_post))
                     self.vm.data['guide_cls']['t-0'] = out['guide_cls']
 
-                    self.eval_seg.update(batch, out, batch_idx=j, prev_frame_num=prev_frame_num, mode=mode)
-                    self.eval_seg.run_for_fscore()
+                    # self.eval_seg.update(batch, out, batch_idx=j, prev_frame_num=prev_frame_num, mode=mode)
+                    # self.eval_seg.run_for_fscore()
 
                     # visualize
                     if self.cfg.disp_test_result == True and ('train' not in mode):
                         out.update(out_post[0])
-                        self.visualizer.display_for_test(batch=batch, out=out, prev_frame_num=prev_frame_num, batch_idx=j, mode=mode)
+                        # self.visualizer.display_for_test(batch=batch, out=out, prev_frame_num=prev_frame_num, batch_idx=j, mode=mode)
+                        self.visualizer.display_for_demo(batch=batch, out=out, prev_frame_num=prev_frame_num, batch_idx=j, mode=mode)
 
                     # record output data
                     self.result['out']['x_coords'] = out_post[0]['x_coords']
@@ -100,7 +102,7 @@ class Test_Process(object):
             save_pickle(path=f'{self.cfg.dir["out"]}/{mode}/pickle/eval_seg_results', data=self.eval_seg.results)
 
         # evaluation
-        return self.evaluation(mode)
+        # return self.evaluation(mode)
 
     def evaluation(self, mode):
         metric = dict()

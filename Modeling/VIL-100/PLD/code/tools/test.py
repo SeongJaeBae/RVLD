@@ -54,7 +54,7 @@ class Test_Process(object):
 
                     key_t = f't-0'
                     if prev_frame_num == 0:
-                        self.vm.forward_for_dict_initialization()
+                        self.vm.forward_for_dict_initialization() #처음 이미지알 굥유
                     else:
                         self.vm.forward_for_dict_memorization()
 

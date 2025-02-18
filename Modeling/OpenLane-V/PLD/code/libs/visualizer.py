@@ -132,7 +132,7 @@ class Visualize_cv(object):
 
                 lane_coords = to_np(torch.cat((x_coord.view(1, len(x_coord), 1), y_coord), dim=2))
                 self.draw_polyline_cv(lane_coords, name='temp', ref_name='temp', color=(255, 255, 255), s=2)
-                self.draw_polyline_cv(lane_coords, name='label_overlap', ref_name='label_overlap', color=color, s=s)
+                # self.draw_polyline_cv(lane_coords, name='label_overlap', ref_name='label_overlap', color=color, s=s)
                 self.draw_polyline_cv(lane_coords, name='img_overlap', ref_name='img_overlap', color=color, s=s)
                 self.draw_polyline_cv(lane_coords, name='seg_overlap', ref_name='seg_overlap', color=color, s=s)
         return self.show['temp']
@@ -187,6 +187,46 @@ class Visualize_cv(object):
         disp = np.concatenate(disp, axis=0)
         self.save_data(path=f'{self.cfg.dir["out"]}/train/display/{batch_idx}.jpg', data=disp)
 
+    def display_for_demo(self, batch, out, prev_frame_num, batch_idx, mode):
+        # img
+        self.update_image(batch['img'][batch_idx], name='img')
+        self.update_image_name(batch['img_name'][batch_idx])
+
+        # label
+        # self.update_label(batch['org_label'][batch_idx], name='org_label')
+
+        # output
+        if prev_frame_num != 0:
+            self.show['seg_map'] = self.b_map_to_rgb_image(out['seg_map'][0])
+        else:
+            self.show['seg_map'] = np.zeros((self.cfg.height, self.cfg.width, 3), dtype=np.uint8)
+        if 'key_guide' in out.keys():
+            self.show['key_guide'] = self.b_map_to_rgb_image(out['key_guide'][0])
+        else:
+            self.show['key_guide'] = np.zeros((self.cfg.height, self.cfg.width, 3), dtype=np.uint8)
+        if prev_frame_num != 0:
+            self.show['aligned_key_guide'] = self.b_map_to_rgb_image(out['aligned_key_guide'][0])
+        else:
+            self.show['aligned_key_guide'] = np.zeros((self.cfg.height, self.cfg.width, 3), dtype=np.uint8)
+
+        if 'aligned_key_probmap' in out.keys():
+            self.show['aligned_key_probmap'] = self.b_map_to_rgb_image(out['aligned_key_probmap'][0])
+        else:
+            self.show['aligned_key_probmap'] = np.zeros((self.cfg.height, self.cfg.width, 3), dtype=np.uint8)
+
+        # self.show['label_overlap'] = self.show['org_label']
+        self.show['seg_overlap'] = self.show['seg_map']
+        self.show['img_overlap'] = self.show['img']
+        self.show['coeff_cls_map'] = self.draw_selected_lane_coords(out['x_coords'], height_idx=out['height_idx'], color=(0, 255, 0), s=2)
+
+        # save result
+        dirname = os.path.dirname(self.show["img_name"])
+        filename = os.path.basename(self.show["img_name"])
+        self.display_imglist(path=f'{self.cfg.dir["out"]}/{mode}/display/{dirname}/{filename}.jpg',
+                             list=['img', 'img_overlap', 'seg_map', 'seg_overlap'])
+
+        if 'mask' in out.keys():
+            self.show.pop('mask')
 
     def display_for_test(self, batch, out, prev_frame_num, batch_idx, mode):
         # img

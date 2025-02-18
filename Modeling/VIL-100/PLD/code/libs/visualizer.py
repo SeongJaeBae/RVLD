@@ -247,7 +247,7 @@ class Visualize_cv(object):
         # save result
         dirname = os.path.dirname(self.show["img_name"])
         filename = os.path.basename(self.show["img_name"])
-        self.display_single_results(path=f'{self.cfg.dir["out"]}/{mode}/display/{dirname}/{filename}.jpg')
+        # self.display_single_results(path=f'{self.cfg.dir["out"]}/{mode}/display/{dirname}/{filename}.jpg')
         # self.display_clrnet_results(path=f'{self.cfg.dir["clrnet"]}/{dirname}/{filename}.jpg')
         self.display_imglist(path=f'{self.cfg.dir["out"]}/{mode}/display/{dirname}/{filename}.jpg',
                              list=['img', 'single', 'aligned_key_guide', 'img_overlap', 'clrnet',

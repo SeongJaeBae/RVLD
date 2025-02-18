@@ -1,5 +1,8 @@
 *.Identifier
 *.pyc
+*.bin
+*.out
+OpenLane/
 OpenLane-V/
 VIL-100/
 pretrained/

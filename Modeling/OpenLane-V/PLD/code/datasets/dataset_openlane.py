@@ -188,7 +188,11 @@ class Dataset_Train(Dataset):
 class Dataset_Test(Dataset):
     def __init__(self, cfg):
         self.cfg = cfg
-        self.datalist = load_pickle(f'{self.cfg.dir["dataset"]}/OpenLane-V/list/datalist_validation')
+
+        #datalist -> custom으로 변경함함
+        self.datalist = load_pickle(f'{self.cfg.dir["dataset"]}/OpenLane-V/list/custom_datalist_validation')
+
+        #전처기 3개 다한 데이터 리스트
         self.datalist_video = load_pickle(f'{self.cfg.dir["pre3_test"]}/datalist_{3}')
 
         if cfg.sampling == True:
@@ -213,22 +217,25 @@ class Dataset_Test(Dataset):
         self.to_tensor = transforms.ToTensor()
         self.normalize = transforms.Normalize(mean=cfg.mean, std=cfg.std)
 
-    def cropping(self, img, lanes):
+    def cropping(self, img):
         img = img.crop((0, self.cfg.crop_size, int(img.size[0]), int(img.size[1])))
-        for i in range(len(lanes['lanes'])):
-            if len(lanes['lanes'][i]) == 0:
-                continue
-            lanes['lanes'][i][:, 1] -= self.cfg.crop_size
-        return img, lanes
+        # for i in range(len(lanes['lanes'])):
+        #     if len(lanes['lanes'][i]) == 0:
+        #         continue
+        #     lanes['lanes'][i][:, 1] -= self.cfg.crop_size
+        # return img, lanes
+        return img
 
     def get_data_org(self, idx):
         img = Image.open(f'{self.cfg.dir["dataset"]}/images/validation/{self.datalist[idx]}.jpg').convert('RGB')
-        anno = load_pickle(f'{self.cfg.dir["dataset"]}/OpenLane-V/label/validation/{self.datalist[idx]}')
-        img, anno = self.cropping(img, anno)
-        return img, anno
+        # anno = load_pickle(f'{self.cfg.dir["dataset"]}/OpenLane-V/label/validation/{self.datalist[idx]}')
+        # img, anno = self.cropping(img, anno)
+        img= self.cropping(img)
+        # return img, anno
+        return img
 
-    def get_data_aug(self, img, anno):
-        img_new, anno_new = self.transform.process_for_test(img, anno['lanes'])
+    def get_data_aug(self, img):
+        img_new = self.transform.process_for_test(img)
 
         img_new = Image.fromarray(img_new)
         img_new = self.to_tensor(img_new)
@@ -236,7 +243,7 @@ class Dataset_Test(Dataset):
 
         return {'img': self.normalize(img_new),
                 'img_rgb': img_new,
-                'lanes': anno_new,
+                # 'lanes': anno_new,
                 'org_h': self.org_height, 'org_w': self.org_width}
 
     def get_downsampled_label_seg(self, lanes, idx, sf):
@@ -285,11 +292,21 @@ class Dataset_Test(Dataset):
     def __getitem__(self, idx):
         out = dict()
         out['img_name'] = self.datalist[idx]
-        out['prev_num'] = len(self.datalist_video[self.datalist[idx]]) - 1
-        img, anno = self.get_data_org(idx)
-        out.update(self.get_data_aug(img, anno))
-        out.update(self.get_label(out))
-        out = self.remove_dict_keys(out)
+
+        #원본 코드
+        # out['prev_num'] = len(self.datalist_video[self.datalist[idx]]) - 1
+        
+        # custom data 기준으로 돌릴때 코드
+        # if out['img_name'].split("/")[-1]
+        if int(out['img_name'].split("/")[-1]) >3:
+            out['prev_num'] = 3
+        else:
+            out['prev_num'] = int(out['img_name'].split("/")[-1])
+
+        img = self.get_data_org(idx)
+        out.update(self.get_data_aug(img))
+        # out.update(self.get_label(out))
+        # out = self.remove_dict_keys(out)
 
         return out
 
